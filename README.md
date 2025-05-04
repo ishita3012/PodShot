@@ -12,7 +12,7 @@
 4. Access the video from starting timestamp
 5. Auto-organize everything into a Google Doc (synced straight to your Drive!)
 
-Refer the Product Requirements Document for more details: <a href="PodShot-PRD.pdf" class="image fit"><img src="images/marr_pic.jpg" alt=""><type="application/pdf"></a>
+Refer the Product Requirements Document for more details: <a href="PodShot-PRD.pdf" class="image fit"><img src="images/marr_pic.jpg" alt="">PodShot-PRD</a>
 
 Following is the automation workflow we developed on n8n:
 
