@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "PodShot",
+  "version": "1.0",
+  "description": "I am your personal AI note taker. Watch and learn anything, leave the stress of managing notes on me.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "storage.sync",
+    "identity",
+    "identity.email",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.googleapis.com/*",
+    "https://accounts.google.com/*",
+    "https://www.youtube.com/*",
+    "https://api.openai.com/*",
+    "http://localhost:8000/*"
+  ],
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_icon": "icon.png"
+  },
+  "options_ui": {
+    "page": "src/settings.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "128": "icon.png"
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content.js"]
+    }
+  ],
+  "oauth2": {
+    "client_id": "231922695311-rhdv8kg6jle3ogb6ramsueauppdbopdl.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/docs",
+      "https://www.googleapis.com/auth/drive.file",
+      "https://www.googleapis.com/auth/drive",
+      "https://www.googleapis.com/auth/youtube.force-ssl"
+    ]
+  }
+}

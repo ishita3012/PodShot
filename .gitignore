@@ -1,0 +1,16 @@
+# Environment variables
+backend/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.env
+
+# Dependency directories
+node_modules/

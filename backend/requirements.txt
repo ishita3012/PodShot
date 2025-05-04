@@ -1,0 +1,220 @@
+cd fastapi
+uvicorn
+yt-dlp
+ffmpeg-python
+openai-whisper # or use openai for cloud API
+python-multipart
+from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional
+import uvicorn
+import os
+import tempfile
+import uuid
+import openai
+from pytube import YouTube
+import subprocess
+import json
+
+app = FastAPI()
+
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # For production, replace with specific origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Models
+class VideoClipRequest(BaseModel):
+    video_url: str
+    start_time: float
+    end_time: float
+    openai_key: Optional[str] = None
+
+class InsightsRequest(BaseModel):
+    transcript: str
+    openai_key: str
+
+# Storage for background tasks
+processing_status = {}
+
+@app.get("/")
+def read_root():
+    return {"status": "Video Clip Insights API is running"}
+
+@app.post("/process-clip")
+async def process_clip(clip_request: VideoClipRequest, background_tasks: BackgroundTasks):
+    """Process a video clip to extract transcript and insights"""
+    task_id = str(uuid.uuid4())
+    processing_status[task_id] = {
+        "status": "processing",
+        "message": "Starting clip processing"
+    }
+    
+    background_tasks.add_task(
+        process_clip_task, 
+        task_id, 
+        clip_request.video_url, 
+        clip_request.start_time, 
+        clip_request.end_time, 
+        clip_request.openai_key
+    )
+    
+    return {"task_id": task_id, "status": "processing"}
+
+@app.get("/status/{task_id}")
+async def check_status(task_id: str):
+    """Check the status of a processing task"""
+    if task_id not in processing_status:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    return processing_status[task_id]
+
+@app.post("/generate-insights")
+async def generate_insights(request: InsightsRequest):
+    """Generate insights from transcript using OpenAI"""
+    try:
+        if not request.openai_key:
+            raise HTTPException(status_code=400, detail="OpenAI API key is required")
+        
+        # Set the OpenAI API key
+        openai.api_key = request.openai_key
+        
+        # Call OpenAI API
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are an expert at analyzing video content. Provide key insights, main topics, and important points from the given transcript."},
+                {"role": "user", "content": f"Please analyze this transcript and provide 3-5 key insights:\n{request.transcript}"}
+            ],
+            max_tokens=300
+        )
+        
+        insights = response.choices[0].message.content
+        return {"insights": insights}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating insights: {str(e)}")
+
+async def process_clip_task(task_id, video_url, start_time, end_time, openai_key):
+    """Background task to process video clip"""
+    try:
+        processing_status[task_id]["message"] = "Downloading video clip"
+        
+        # Create temp directory
+        temp_dir = tempfile.mkdtemp()
+        video_path = os.path.join(temp_dir, f"clip_{task_id}.mp4")
+        audio_path = os.path.join(temp_dir, f"audio_{task_id}.wav")
+        
+        # Download video
+        try:
+            yt = YouTube(video_url)
+            video = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+            
+            if not video:
+                processing_status[task_id] = {
+                    "status": "error",
+                    "message": "Could not find suitable video stream"
+                }
+                return
+                
+            video.download(output_path=temp_dir, filename=f"clip_{task_id}.mp4")
+            
+            # Trim video to desired segment using ffmpeg
+            subprocess.run([
+                "ffmpeg", "-i", video_path, 
+                "-ss", str(start_time), 
+                "-to", str(end_time), 
+                "-c", "copy", 
+                f"{temp_dir}/trimmed_{task_id}.mp4"
+            ])
+            
+            # Replace original with trimmed
+            os.replace(f"{temp_dir}/trimmed_{task_id}.mp4", video_path)
+            
+            # Extract audio for transcription
+            subprocess.run([
+                "ffmpeg", "-i", video_path,
+                "-vn", "-acodec", "pcm_s16le", "-ar", "16000", "-ac", "1",
+                audio_path
+            ])
+            
+        except Exception as e:
+            processing_status[task_id] = {
+                "status": "error",
+                "message": f"Error downloading or processing video: {str(e)}"
+            }
+            return
+        
+        # Transcribe audio using Whisper
+        processing_status[task_id]["message"] = "Generating transcript"
+        try:
+            if not openai_key:
+                processing_status[task_id] = {
+                    "status": "error",
+                    "message": "OpenAI API key is required for transcription"
+                }
+                return
+                
+            openai.api_key = openai_key
+            
+            with open(audio_path, "rb") as audio_file:
+                transcription = openai.Audio.transcribe("whisper-1", audio_file)
+            
+            transcript = transcription.text
+            
+        except Exception as e:
+            processing_status[task_id] = {
+                "status": "error",
+                "message": f"Error transcribing audio: {str(e)}"
+            }
+            return
+        
+        # Generate insights using OpenAI
+        processing_status[task_id]["message"] = "Generating insights"
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are an expert at analyzing video content. Provide key insights, main topics, and important points from the given transcript."},
+                    {"role": "user", "content": f"Please analyze this transcript and provide 3-5 key insights:\n{transcript}"}
+                ],
+                max_tokens=300
+            )
+            
+            insights = response.choices[0].message.content
+            
+        except Exception as e:
+            processing_status[task_id] = {
+                "status": "error",
+                "message": f"Error generating insights: {str(e)}"
+            }
+            return
+        
+        # Update status with completed information
+        processing_status[task_id] = {
+            "status": "completed",
+            "transcript": transcript,
+            "insights": insights
+        }
+        
+        # Clean up temp files
+        try:
+            os.remove(video_path)
+            os.remove(audio_path)
+            os.rmdir(temp_dir)
+        except:
+            pass
+            
+    except Exception as e:
+        processing_status[task_id] = {
+            "status": "error",
+            "message": f"Unexpected error: {str(e)}"
+        }
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

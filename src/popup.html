@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PodShot</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>PodShot</h2>
+    
+    <div id="status" class="status-bar"></div>
+    
+    <div class="button-row">
+      <button id="captureBtn" class="btn purple">Start<br>Capturing</button>
+      <button id="endBtn" class="btn grey" disabled>End Clip</button>
+      <button id="insightsBtn" class="btn purple">Generate<br>Insights!</button>
+    </div>
+    
+    <div id="clipInfo" class="clip-info">
+      <div id="startTime"></div>
+      <div id="endTime"></div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
