@@ -1,0 +1,479 @@
+{
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d9fb60e3-5e9d-4e81-9291-79d9b0067f4d",
+              "name": "youtubeUrl",
+              "value": "={{ $json.youtubeUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "15f8af38-bf4e-4a8a-9f28-a11721fd12c0",
+      "name": "Get YouTube URL",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -120,
+        -460
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "jsCode": "const extractYoutubeDetails = (url) => {\n  const videoIdPattern = /(?:youtube\\.com\\/(?:[^\\/]+\\/.+\\/|(?:v|e(?:mbed)?)\\/|.*[?&]v=)|youtu\\.be\\/)([^\"&?\\/\\s]{11})/;\n  const videoIdMatch = url.match(videoIdPattern);\n  const videoId = videoIdMatch ? videoIdMatch[1] : null;\n\n  // Manual parsing of query parameters\n  const getQueryParam = (paramName) => {\n    const regex = new RegExp('[?&]' + paramName + '=([^&#]*)', 'i');\n    const match = regex.exec(url);\n    return match ? decodeURIComponent(match[1]) : null;\n  };\n\n  const start = getQueryParam(\"t\") || getQueryParam(\"start\");\n  const startTime = start ? parseInt(start, 10) : null;\n  const endTime = startTime !== null ? startTime + 10 : null;\n\n  return {\n    videoId,\n    startTime,\n    endTime\n  };\n};\n\n// Input URL from previous node\nconst youtubeUrl = items[0].json.youtubeUrl;\n\n// Process the URL and return the details\nconst details = extractYoutubeDetails(youtubeUrl);\n\nreturn [{\n  json: details\n}];\n"
+      },
+      "id": "61c7f5c0-d26c-4264-b15e-c3fe87ac9ee2",
+      "name": "YouTube Video ID",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        100,
+        -460
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "get",
+        "videoId": "={{ $json.videoId }}",
+        "part": "={{ [\"*\"] }}",
+        "options": {}
+      },
+      "id": "0bdb121f-05c8-4ef9-ba30-7e771791db6b",
+      "name": "Get YouTube Video",
+      "type": "n8n-nodes-base.youTube",
+      "position": [
+        240,
+        -620
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "B500WcGCRUFzV6xR",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "driveId": "1PfofSE_nmNQD_V6oqGIdpkKWbxJiTbU6",
+        "title": "={{ $json.title }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        500,
+        160
+      ],
+      "id": "ca0a1ecb-3269-41dc-8cd1-e6737fa4d70f",
+      "name": "Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "dPKq0zs6HGSRB4rl",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "deepseek/deepseek-chat-v3-0324:free",
+          "mode": "list",
+          "cachedResultName": "deepseek/deepseek-chat-v3-0324:free"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        220
+      ],
+      "id": "773a443f-d37d-46e6-a504-e5f70271491b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "tGXXgL9C3vwmvdkT",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "=1RNFHhYflMM_lWvSUajCOdWAgdFoGIog6mR1GyLYstTc\n",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "locationChoice": "location",
+              "text": "={{ $json.title }}"
+            },
+            {
+              "action": "insert",
+              "locationChoice": "location",
+              "index": 2,
+              "text": "={{ $json.introduction }}"
+            },
+            {
+              "action": "insert",
+              "locationChoice": "location",
+              "index": 3,
+              "text": "={{ $json.bulletText }}"
+            },
+            {
+              "action": "insert",
+              "locationChoice": "location",
+              "index": 4,
+              "text": "={{ $json.additionalInsights }}"
+            },
+            {
+              "action": "insert",
+              "locationChoice": "location",
+              "index": 5,
+              "text": "={{ $json.videoSegmentUrl }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        700,
+        0
+      ],
+      "id": "2d85234a-5350-4488-bcc9-09aafc3bd934",
+      "name": "Google Docs1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "dPKq0zs6HGSRB4rl",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "videoId": "={{ $json.videoId }}"
+      },
+      "type": "n8n-nodes-youtube-transcription-kasha.youtubeTranscripter",
+      "typeVersion": 1,
+      "position": [
+        280,
+        -460
+      ],
+      "id": "8082bdd5-7331-4f79-939e-f60f1d2694a2",
+      "name": "YouTube Transcript"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=transcript",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -460
+      ],
+      "id": "7e1f93e3-be48-472f-97ef-108ae5b68a73",
+      "name": "Split Out3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the two timestamped YouTube URLs from the trigger node\nconst urlItems = $items(\"Trigger\", 0);\n\n// Extract URLs\nconst url1 = urlItems[0].json.youtubeUrl;\nconst url2 = urlItems[1].json.youtubeUrl;\n\n// Extract the \"t\" time in seconds from each URL\nconst extractStartTime = (url) => {\n  const match = url.match(/[?&]t=(\\d+)s?/);\n  return match ? parseInt(match[1], 10) : null;\n};\n\nconst startTime = extractStartTime(url1);\nconst endTime = extractStartTime(url2);\n\n// Get transcript items from Split Out3 node\nconst transcriptItems = $items(\"Split Out3\", 0);\n\n// Filter based on offset (timestamp)\nconst filtered = transcriptItems.filter(item => {\n  const offset = item.json.offset;\n  return offset >= startTime && offset < endTime;\n});\n\nreturn filtered;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        -460
+      ],
+      "id": "f895a2d6-8570-497e-8423-c13ee5188719",
+      "name": "Code"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -460
+      ],
+      "id": "43c670df-f16c-4b5a-bc2d-403d4e63d83e",
+      "name": "Trigger"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        860,
+        -460
+      ],
+      "id": "a9a8d73f-12af-49f8-b94e-92267476c456",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/webhook/recording-complete",
+        "options": {
+          "responseData": " {      \"status\": \"success\"    }"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        -300
+      ],
+      "id": "0bdc191a-0511-4ae2-aa64-d0e6f58e6398",
+      "name": "Webhook",
+      "webhookId": "5e045dc5-65bf-4f01-8fba-5c8968137f4a"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Transcript:\n{{ Array.isArray($json.data) ? $json.data.map(d => d.text).join(\" \") : \"No transcript data available.\" }}\n\nInstructions:\nUsing the transcript above, generate a clean, structured Markdown document with the following format:\n\n# [Your AI-Generated Title Here]  \n(Create a clear, relevant title based on the video content.)\n\n## Introduction  \nWrite a brief paragraph summarizing the topic and context of the video in 2–3 sentences.\n\n## Key Insights from the Video  \nPresent the key points or steps as bullet points. Use a hyphen (`-`) at the start of each line.\n\n## Additional Insights  \nBased on the transcript, provide your own AI-generated insights or takeaways to help the reader understand the significance or application of the topic.\n\nAt the end, include a Markdown-style clickable link to the video segment using this format:\n[Watch the full segment here](https://www.youtube.com/watch?v={{ $json.videoId || 'VIDEO_ID' }}&t={{ Math.floor($json.data[0].offset || 0) }}s)\n",
+        "options": {
+          "systemMessage": "You are a helpful assistant that transforms video transcript segments into structured, well-written documents. The documents should preserve the speaker’s message, improve clarity, and organize information into logical sections. "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        -80,
+        -20
+      ],
+      "id": "525af99e-3049-4b2d-8811-d62286df33a2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "let input = $json.output || \"\";\n\n// Remove markdown code block if present\ninput = input.replace(/^```markdown\\n|```$/g, \"\").trim();\n\n// Extract sections using markdown structure\nconst title = (input.match(/^#\\s+(.+?)\\s{2,}\\n/) || [])[1] || \"Untitled\";\n\nconst introduction = (\n  input.match(/##\\s*Introduction\\s{2,}\\n([\\s\\S]+?)\\n{2,}##\\s*Key Insights from the Video/) || []\n)[1] || \"No introduction found.\";\n\nconst keyIdeasRaw = (\n  input.match(/##\\s*Key Insights from the Video\\s{2,}\\n([\\s\\S]+?)\\n{2,}##\\s*Additional Insights/) || []\n)[1] || \"\";\n\nconst additionalInsights = (\n  input.match(/##\\s*Additional Insights\\s{2,}\\n([\\s\\S]+?)\\n{2,}\\[/) || []\n)[1] || \"No additional insights found.\";\n\nconst linkMatch = input.match(/\\[([^\\]]+)\\]\\(([^)]+)\\)/) || [];\n\n// Format key insights as bullets\nconst keyIdeas = keyIdeasRaw\n  .split(\"\\n\")\n  .filter(line => line.trim().startsWith(\"-\"))\n  .map(line => `• ${line.replace(/^- /, \"\").trim()}`)\n  .join(\"\\n\");\n\n// Output structured JSON\nreturn [{\n  json: {\n    title: title.trim(),\n    introduction: introduction.trim(),\n    bulletText: keyIdeas || \"No key ideas listed.\",\n    additionalInsights: additionalInsights.trim(),\n    videoSegmentText: linkMatch[1] || \"Watch the full segment\",\n    videoSegmentUrl: linkMatch[2] || \"https://www.youtube.com/\"\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ],
+      "id": "8229dd3d-9e88-42f9-8423-ccb8205c43c2",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "content": "# Workflow Overview\n\n## Input Source: Chrome Extension\nA Chrome extension acts as the front end. When a user clicks on a moment in a YouTube video, it sends a timestamped URL to this workflow via a webhook.\n\n## Automation Flow\n1.  Trigger:\nThe workflow starts when the webhook receives a request from the Chrome Extension.\n\n2.  Video Processing:\nFetch video metadata (title, description)\n\nRetrieve full YouTube transcript\n\nExtract video ID and timestamp\n\n3.  AI Summary Generation:\nTranscript is passed to an AI Agent\n\nAI generates a clean structured summary:\n\nTitle\nIntroduction\nKey Insights from the Video\nAdditional Insights\nLink for the youtube video\n\n4. Document Creation:\nGoogle Docs (Create) node creates a new document\n\nGoogle Docs (Update) node can append to an existing doc\n\n",
+        "height": 980,
+        "width": 740
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -940,
+        -940
+      ],
+      "typeVersion": 1,
+      "id": "3034850b-6a4c-4ab6-b21a-551d4c67c9cf",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Summarizing",
+        "height": 520,
+        "width": 1280,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -160,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "c153c329-38e6-40d9-93e0-75672bd4ad63",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Transcription",
+        "height": 460,
+        "width": 1340,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -180,
+        -660
+      ],
+      "typeVersion": 1,
+      "id": "3b21a1ad-020f-4e12-9c52-80269418094c",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {
+    "Trigger": [
+      {
+        "json": {
+          "youtubeUrl": "https://www.youtube.com/watch?v=ivty6t0lUkQ&t=10s"
+        }
+      },
+      {
+        "json": {
+          "youtubeUrl": "https://www.youtube.com/watch?v=ivty6t0lUkQ&t=40s"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Get YouTube URL": {
+      "main": [
+        [
+          {
+            "node": "YouTube Video ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube Video ID": {
+      "main": [
+        [
+          {
+            "node": "Get YouTube Video",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "YouTube Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get YouTube Video": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube Transcript": {
+      "main": [
+        [
+          {
+            "node": "Split Out3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out3": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get YouTube URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Docs1": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Google Docs1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "73060fe9-eb71-4b8f-a9e8-10e860b0d647",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ea87b9e02d22851fcb0b842e03fa52c177d23542c39534d4071a791768bcaa1c"
+  },
+  "id": "kLxcYtc7WDFLWt3J",
+  "tags": []
+}
