@@ -31,7 +31,7 @@ Refer the Product Requirements Document for more details: <a href="PodShot-PRD.p
 <br/>
 
 
-__By:__ 
+__By:__      <br/>
 Ishita Rastogi<br/>
 Divya Gupta<br/>
 
