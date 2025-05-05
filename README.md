@@ -14,8 +14,9 @@
 
 Refer the Product Requirements Document for more details: <a href="PodShot-PRD.pdf" class="image fit"><img src="images/marr_pic.jpg" alt="">PodShot-PRD</a>
 
-Following is the automation workflow we developed on n8n:
+Following is the automation workflow we developed using n8n:
 
 ![Image 5-4-25 at 6 44 PM](https://github.com/user-attachments/assets/ca750532-7508-4f12-aca5-7207b31e7d35)
 
 Some snippets:
+<img width="348" alt="Screenshot 2025-05-04 at 6 58 49 PM" src="https://github.com/user-attachments/assets/f20fd856-2598-487a-80aa-b5475aea912d" />
