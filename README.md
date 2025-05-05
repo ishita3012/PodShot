@@ -13,6 +13,7 @@
 5. Auto-organize everything into a Google Doc (synced straight to your Drive!)
 
 Refer the Product Requirements Document for more details: <a href="PodShot-PRD.pdf" class="image fit"><img src="images/marr_pic.jpg" alt="">PodShot-PRD</a>
+Working Demo: https://drive.google.com/file/d/1OaMYExAmux4k9d555iGl3yx4uGbkoaEf/view?usp=sharing
 
 
 ### Following is the automation workflow we developed using n8n:
