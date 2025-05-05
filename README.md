@@ -15,13 +15,14 @@
 Refer the Product Requirements Document for more details: <a href="PodShot-PRD.pdf" class="image fit"><img src="images/marr_pic.jpg" alt="">PodShot-PRD</a>
 
 
-Following is the automation workflow we developed using n8n:
+### Following is the automation workflow we developed using n8n:
 
 ![Image 5-4-25 at 6 44 PM](https://github.com/user-attachments/assets/ca750532-7508-4f12-aca5-7207b31e7d35)
 
-Some snippets:
+## Some snippets:
 
-<img width="399" alt="Screenshot 2025-05-04 at 6 58 17 PM" src="https://github.com/user-attachments/assets/5eaf3bda-0274-45fe-9a69-3c28beaca631" /> <img width="352" alt="Screenshot 2025-05-04 at 6 58 29 PM" src="https://github.com/user-attachments/assets/f099bf2c-d1c8-497d-b1a1-fdeb975ea84e" /> <img width="348" alt="Screenshot 2025-05-04 at 6 58 49 PM" src="https://github.com/user-attachments/assets/b78875d4-bf8b-472c-a0a7-b810cf1d06cc" />
+<img width="399" alt="Screenshot 2025-05-04 at 6 58 17 PM" src="https://github.com/user-attachments/assets/5eaf3bda-0274-45fe-9a69-3c28beaca631" /> 
+<img width="352" alt="Screenshot 2025-05-04 at 6 58 29 PM" src="https://github.com/user-attachments/assets/f099bf2c-d1c8-497d-b1a1-fdeb975ea84e" /> <img width="348" alt="Screenshot 2025-05-04 at 6 58 49 PM" src="https://github.com/user-attachments/assets/b78875d4-bf8b-472c-a0a7-b810cf1d06cc" />
 <img width="1468" alt="Screenshot 2025-05-04 at 7 00 08 PM" src="https://github.com/user-attachments/assets/5f32902d-fae1-4671-b998-509de20cb437" />
 
 
