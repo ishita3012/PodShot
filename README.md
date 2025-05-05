@@ -28,8 +28,11 @@ Refer the Product Requirements Document for more details: <a href="PodShot-PRD.p
 <img width="348" alt="Screenshot 2025-05-04 at 6 58 49 PM" src="https://github.com/user-attachments/assets/161fcd7f-265a-48e4-bdb4-fbce954e0dea" />
   
 <img width="1468" alt="Screenshot 2025-05-04 at 7 00 08 PM" src="https://github.com/user-attachments/assets/4353e3b3-286e-4374-83a6-c57f9de51912" />
+
   
 **Creators:**
+
 Ishita Rastogi
+
 Divya Gupta
 
