@@ -21,10 +21,12 @@ Refer the Product Requirements Document for more details: <a href="PodShot-PRD.p
 
 ## Some snippets:
 
-<img width="399" alt="Screenshot 2025-05-04 at 6 58 17 PM" src="https://github.com/user-attachments/assets/5eaf3bda-0274-45fe-9a69-3c28beaca631" /> 
+<img width="399" alt="Screenshot 2025-05-04 at 6 58 17 PM" src="https://github.com/user-attachments/assets/989380a4-7c7a-440f-b305-c66b86306044" />
 
-<img width="352" alt="Screenshot 2025-05-04 at 6 58 29 PM" src="https://github.com/user-attachments/assets/f099bf2c-d1c8-497d-b1a1-fdeb975ea84e" /> <img width="348" alt="Screenshot 2025-05-04 at 6 58 49 PM" src="https://github.com/user-attachments/assets/b78875d4-bf8b-472c-a0a7-b810cf1d06cc" />
-<img width="1468" alt="Screenshot 2025-05-04 at 7 00 08 PM" src="https://github.com/user-attachments/assets/5f32902d-fae1-4671-b998-509de20cb437" />
+<img width="352" alt="Screenshot 2025-05-04 at 6 58 29 PM" src="https://github.com/user-attachments/assets/ecdb063c-9f6d-47a7-957c-7e3cf8578340" />  <img width="348" alt="Screenshot 2025-05-04 at 6 58 49 PM" src="https://github.com/user-attachments/assets/161fcd7f-265a-48e4-bdb4-fbce954e0dea" />
+<img width="1468" alt="Screenshot 2025-05-04 at 7 00 08 PM" src="https://github.com/user-attachments/assets/4353e3b3-286e-4374-83a6-c57f9de51912" />
 
-
+**Creators:**
+Ishita Rastogi
+Divya Gupta
 
